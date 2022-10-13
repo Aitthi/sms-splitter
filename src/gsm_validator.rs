@@ -100,7 +100,11 @@ impl GsmValidator {
         self.exists_in_array(char_code, shift_table)
     }
 
-    pub fn validate_message_in_char_codes_list(&self,message: String,char_codes: Vec<u16>) -> bool {
+    pub fn validate_message_in_char_codes_list(
+        &self,
+        message: String,
+        char_codes: Vec<u16>,
+    ) -> bool {
         for c in message.chars() {
             if !self.exists_in_array(c as u16, char_codes.clone()) {
                 return false;
@@ -195,7 +199,10 @@ mod tests {
     fn gsm_validator_with_shift_table_turkish() {
         let gsm_validator = GsmValidator::new();
         let message = "@£$¥€éùıòÇ\nĞğ\rÅåΔ_ΦΓΛΩΠΨΣΘΞŞşßÉ\x20!\"#¤%&\'()*+,-./0123456789:;<=>?İABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÑÜ§çabcdefghijklmnopqrstuvwxyzäöñüàf^{}[~]|";
-        assert_eq!(gsm_validator.validate_message_with_shift_table(message.to_string()), true);
+        assert_eq!(
+            gsm_validator.validate_message_with_shift_table(message.to_string()),
+            true
+        );
     }
 
     // Validating a message of every valid GSM Spanish shift table characters
@@ -203,7 +210,10 @@ mod tests {
     fn gsm_validator_with_shift_table_spanish() {
         let gsm_validator = GsmValidator::new();
         let message = "@£$¥èéùìòÇ\nØø\rÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ\x20!\"#¤%&\'()*+,-./0123456789:;<=>?¡ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÑÜ§¿abcdefghijklmnopqrstuvwxyzäöñüàçf^{}\\[~]|ÁÍÓÚá€íóú";
-        assert_eq!(gsm_validator.validate_message_with_shift_table(message.to_string()), true);
+        assert_eq!(
+            gsm_validator.validate_message_with_shift_table(message.to_string()),
+            true
+        );
     }
 
     // Validating a message of every valid GSM Portuguese shift table characters
@@ -211,7 +221,10 @@ mod tests {
     fn gsm_validator_with_shift_table_portuguese() {
         let gsm_validator = GsmValidator::new();
         let message = "@£$¥êéúíóç\nÔô\rÁáΔ_ªÇÀ∞^\\€Ó|ÂâÊÉ\x20!\"#º%&\'()*+,-./0123456789:;<=>?ÍABCDEFGHIJKLMNOPQRSTUVWXYZÃÕÚÜ§~abcdefghijklmnopqrstuvwxyzãõ`üàfΦΓ^ΩΠΨΣΘ{}\\[~]|";
-        assert_eq!(gsm_validator.validate_message_with_shift_table(message.to_string()), true);
+        assert_eq!(
+            gsm_validator.validate_message_with_shift_table(message.to_string()),
+            true
+        );
     }
 
     // Validating a message of mixed valid GSM shift tables
@@ -219,7 +232,10 @@ mod tests {
     fn gsm_validator_with_shift_table_mixed() {
         let gsm_validator = GsmValidator::new();
         let message = "∞Ø";
-        assert_eq!(gsm_validator.validate_message_with_shift_table(message.to_string()), true);
+        assert_eq!(
+            gsm_validator.validate_message_with_shift_table(message.to_string()),
+            true
+        );
     }
 
     // Validating all GSM characters
@@ -238,7 +254,10 @@ mod tests {
         let gsm_validator = GsmValidator::new();
         let message = "@£$¥€éùıòÇ\nĞğ\rÅåΔ_ΦΓΛΩΠΨΣΘΞŞşßÉ\x20!\"#¤%&\'()*+,-./0123456789:;<=>?İABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÑÜ§çabcdefghijklmnopqrstuvwxyzäöñüàf^{}[~]|";
         for c in message.chars() {
-            assert_eq!(gsm_validator.clone().validate_character_with_shift_table(c), true);
+            assert_eq!(
+                gsm_validator.clone().validate_character_with_shift_table(c),
+                true
+            );
         }
     }
 
@@ -248,7 +267,10 @@ mod tests {
         let gsm_validator = GsmValidator::new();
         let message = "@£$¥êéúíóç\nÔô\rÁáΔ_ªÇÀ∞^\\€Ó|ÂâÊÉ\x20!\"#º%&\'()*+,-./0123456789:;<=>?ÍABCDEFGHIJKLMNOPQRSTUVWXYZÃÕÚÜ§~abcdefghijklmnopqrstuvwxyzãõ`üàfΦΓ^ΩΠΨΣΘ{}\\[~]|";
         for c in message.chars() {
-            assert_eq!(gsm_validator.clone().validate_character_with_shift_table(c), true);
+            assert_eq!(
+                gsm_validator.clone().validate_character_with_shift_table(c),
+                true
+            );
         }
     }
 
@@ -259,5 +281,4 @@ mod tests {
         let message = '\u{1F433}';
         assert_eq!(gsm_validator.validate_character(message), false);
     }
-
 }

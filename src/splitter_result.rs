@@ -28,7 +28,6 @@ impl Clone for SplitterResult {
     }
 }
 
-
 #[derive(Debug)]
 pub struct SplitterPart {
     pub content: String,

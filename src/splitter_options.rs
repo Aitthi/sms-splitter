@@ -1,9 +1,7 @@
-
-
 #[derive(Debug)]
 pub struct SplitterOptions {
     pub support_shift_tables: bool,
-    pub summary: bool
+    pub summary: bool,
 }
 
 impl SplitterOptions {

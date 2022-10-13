@@ -36,7 +36,12 @@ impl UnicodeSplitter {
         let mut content = String::from("");
         if !self.options.summary {
             if part_end > 0 {
-                content = self.message.chars().skip(self.part_start).take(part_end+1).collect();
+                content = self
+                    .message
+                    .chars()
+                    .skip(self.part_start)
+                    .take(part_end + 1)
+                    .collect();
             } else {
                 content = self.message.chars().skip(self.part_start).collect();
             }
@@ -55,14 +60,14 @@ impl UnicodeSplitter {
         if self.message.is_empty() {
             return SplitterResult::empty();
         }
-       
+
         let mut c = 0;
         let count = self.message.chars().count();
         // println!("count: {}", count);
         while c < count {
             let code = self.message.chars().nth(c).unwrap();
             let c_len = code.len_utf16();
-            let mut utf_16 = [0u16;10];
+            let mut utf_16 = [0u16; 10];
             let utf_16 = code.encode_utf16(&mut utf_16[0..c_len]);
             let mut i = 0;
             while i < c_len {
@@ -100,7 +105,11 @@ impl UnicodeSplitter {
                             self.total_bytes,
                         ));
                     } else {
-                        parts.push(SplitterPart::new(self.message.clone(), self.total_length, self.total_bytes));
+                        parts.push(SplitterPart::new(
+                            self.message.clone(),
+                            self.total_length,
+                            self.total_bytes,
+                        ));
                     }
                     return SplitterResult {
                         parts: parts.clone(),
@@ -125,8 +134,6 @@ impl Default for UnicodeSplitter {
     }
 }
 
-
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -142,7 +149,10 @@ mod tests {
         file.read_to_string(&mut data).unwrap();
         let test_data: serde_json::Value = serde_json::from_str(&data).unwrap();
         for test in test_data.as_array().unwrap() {
-            println!("TEST: {:?}", test["description"].to_string().replace("\"", ""));
+            println!(
+                "TEST: {:?}",
+                test["description"].to_string().replace("\"", "")
+            );
             let message = test["message"].as_str().unwrap().to_string();
             let expected_parts = test["parts"].as_array().unwrap();
             let expected_total_length = test["totalLength"].as_u64().unwrap() as usize;
@@ -155,8 +165,14 @@ mod tests {
             assert_eq!(result.total_bytes, expected_total_bytes);
             for (i, part) in result.parts.iter().enumerate() {
                 let expected_part = expected_parts[i].as_object().unwrap();
-                assert_eq!(part.bytes, expected_part["bytes"].as_u64().unwrap() as usize);
-                assert_eq!(part.length, expected_part["length"].as_u64().unwrap() as usize);
+                assert_eq!(
+                    part.bytes,
+                    expected_part["bytes"].as_u64().unwrap() as usize
+                );
+                assert_eq!(
+                    part.length,
+                    expected_part["length"].as_u64().unwrap() as usize
+                );
                 assert_eq!(part.content, expected_part["content"].as_str().unwrap());
             }
             // println!("--------------------------------------------");
