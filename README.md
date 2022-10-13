@@ -1,11 +1,11 @@
 # SMS Splitter
 
-[![Documentation](https://img.shields.io/badge/docs-0.1.2-4d76ae?style=for-the-badge)](https://docs.rs/sms_splitter)
+[![Documentation](https://img.shields.io/badge/docs-0.1.3-4d76ae?style=for-the-badge)](https://docs.rs/sms_splitter)
 [![Version](https://img.shields.io/crates/v/sms_splitter?style=for-the-badge)](https://crates.io/crates/sms_splitter)
 [![License](https://img.shields.io/crates/l/sms_splitter?style=for-the-badge)](https://crates.io/crates/sms_splitter)
 
-An SMS message splitter with support for both GSM and Unicode written in JavaScript.
-GSM support is limited to GSM 03.38 with the extension table (see the [Wikipedia article](https://en.wikipedia.org/wiki/GSM_03.38#GSM_7_bit_default_alphabet_and_extension_table_of_3GPP_TS_23.038_.2F_GSM_03.38)); no support for natural language shift tables exists at this time.
+An SMS message splitter with support for both GSM and Unicode written in Rust.
+GSM support is limited to GSM 03.38 with the extension table (see the [Wikipedia article](https://en.wikipedia.org/wiki/GSM_03.38#GSM_7_bit_default_alphabet_and_extension_table_of_3GPP_TS_23.038_.2F_GSM_03.38))
 
 ## Installation
 
