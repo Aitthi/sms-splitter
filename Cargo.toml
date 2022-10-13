@@ -1,6 +1,6 @@
 [package]
 name = "sms_splitter"
-version = "0.1.3"
+version = "0.1.5"
 edition = "2021"
 license = "MIT"
 authors = ["Aitthi <meanstack20@gmail.com>"]
