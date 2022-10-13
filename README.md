@@ -1,1 +1,1 @@
-# sms-splitter
+# SMS Splitter

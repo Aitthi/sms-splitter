@@ -2,7 +2,13 @@
 name = "sms_splitter"
 version = "0.1.0"
 edition = "2021"
-
+license = "MIT"
+authors = ["Aitthi <meanstack20@gmail.com>"]
+description = "An SMS message splitter and part calculator with support for GSM and Unicode"
+categories = ["sms", "gsm", "unicode"]
+keywords = ["SMS", "GSM", "Unicode", "splitter", "split-sms"]
+repository = "https://github.com/Aitthi/sms-splitter"
+readme = "README.md"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
