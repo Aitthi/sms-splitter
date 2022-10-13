@@ -1,6 +1,6 @@
 # SMS Splitter
 
-[![Documentation](https://img.shields.io/badge/docs-0.1.0-4d76ae?style=for-the-badge)](https://docs.rs/sms_splitter)
+[![Documentation](https://img.shields.io/badge/docs-0.1.2-4d76ae?style=for-the-badge)](https://docs.rs/sms_splitter)
 [![Version](https://img.shields.io/crates/v/sms_splitter?style=for-the-badge)](https://crates.io/crates/sms_splitter)
 [![License](https://img.shields.io/crates/l/sms_splitter?style=for-the-badge)](https://crates.io/crates/sms_splitter)
 
