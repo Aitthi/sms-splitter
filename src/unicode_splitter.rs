@@ -5,125 +5,140 @@ use crate::{
 
 pub struct UnicodeSplitter {
     options: SplitterOptions,
-    messages: Vec<SplitterPart>,
-    length: usize,
-    bytes: usize,
-    total_bytes: usize,
-    total_length: usize,
-    part_start: usize,
-    message: String,
 }
 
 impl UnicodeSplitter {
     pub fn new(options: SplitterOptions) -> UnicodeSplitter {
-        UnicodeSplitter {
-            options,
-            messages: Vec::new(),
-            length: 0,
-            bytes: 0,
-            total_bytes: 0,
-            total_length: 0,
-            part_start: 0,
-            message: String::from(""),
-        }
+        UnicodeSplitter { options }
     }
 
     fn is_high_surrogate(&self, code: u16) -> bool {
         code >= 55296 && code <= 56319
     }
 
-    fn bank(&mut self, part_end: usize) {
-        let mut content = String::from("");
-        if !self.options.summary {
-            if part_end > 0 {
-                content = self
-                    .message
-                    .chars()
-                    .skip(self.part_start)
-                    .take(part_end + 1)
-                    .collect();
-            } else {
-                content = self.message.chars().skip(self.part_start).collect();
-            }
-        }
-        let msg = SplitterPart::new(content, self.length, self.bytes);
-        self.messages.push(msg);
-        self.part_start = part_end + 1;
-        self.total_length += self.length;
-        self.length = 0;
-        self.total_bytes += self.bytes;
-        self.bytes = 0;
-    }
-
-    pub fn split(&mut self, message: String) -> SplitterResult {
-        self.message = message;
-        if self.message.is_empty() {
+    pub fn split(&self, message: String) -> SplitterResult {
+        let original_message = message.clone();
+        let message = message.encode_utf16().collect::<Vec<u16>>();
+        if message.is_empty() {
             return SplitterResult::empty();
         }
-
-        let mut c = 0;
-        let count = self.message.chars().count();
-        // println!("count: {}", count);
-        while c < count {
-            let code = self.message.chars().nth(c).unwrap();
-            let c_len = code.len_utf16();
-            let mut utf_16 = [0u16; 10];
-            let utf_16 = code.encode_utf16(&mut utf_16[0..c_len]);
-            let mut i = 0;
-            while i < c_len {
-                let high_surrogate = self.is_high_surrogate(utf_16[i]);
-                if high_surrogate {
-                    if self.bytes == 132 {
-                        self.bank(c - 1);
+        let mut messages: Vec<SplitterPart> = Vec::new();
+        let mut length = 0;
+        let mut bytes = 0;
+        let mut total_bytes = 0;
+        let mut total_length = 0;
+        let mut part_start = 0;
+        let bank = |part_start: &mut usize,
+                    part_end: usize,
+                    bytes: &mut usize,
+                    length: &mut usize,
+                    total_bytes: &mut usize,
+                    total_length: &mut usize,
+                    messages: &mut Vec<SplitterPart>| {
+            let mut content: Vec<u16> = Vec::new();
+            if !self.options.summary {
+                if part_end > 0 {
+                    for i in *part_start..part_end + 1 {
+                        content.push(message[i]);
                     }
-                    self.bytes += 2;
-                    i += 1;
+                } else {
+                    for i in *part_start..message.len() {
+                        content.push(message[i]);
+                    }
                 }
-                self.bytes += 2;
-                self.length += 1;
-                if self.bytes == 134 {
-                    self.bank(c);
+            }
+            let content = String::from_utf16(&content).unwrap();
+            let msg = SplitterPart::new(content, *length, *bytes);
+            messages.push(msg);
+            *part_start = part_end + 1;
+            *total_length += *length;
+            *length = 0;
+            *total_bytes += *bytes;
+            *bytes = 0;
+        };
+        let count = message.len();
+        let mut i = 0;
+        while i < count {
+            let space = '\u{0020}'
+                .to_string()
+                .encode_utf16()
+                .collect::<Vec<u16>>()
+                .get(0)
+                .unwrap()
+                .clone();
+            let code = message.get(i).unwrap_or(&space);
+            let high_surrogate = self.is_high_surrogate(*code);
+            // println!("bytes: {} {} {}", bytes, code, high_surrogate);
+            if high_surrogate {
+                if bytes == 132 {
+                    bank(
+                        &mut part_start,
+                        i - 1,
+                        &mut bytes,
+                        &mut length,
+                        &mut total_bytes,
+                        &mut total_length,
+                        &mut messages,
+                    );
                 }
+                bytes += 2;
                 i += 1;
             }
-            c += 1;
+            bytes += 2;
+            length += 1;
+            if bytes == 134 {
+                bank(
+                    &mut part_start,
+                    i,
+                    &mut bytes,
+                    &mut length,
+                    &mut total_bytes,
+                    &mut total_length,
+                    &mut messages,
+                );
+            }
+            i += 1;
         }
 
-        if self.bytes > 0 {
-            self.bank(0);
+        if bytes > 0 {
+            bank(
+                &mut part_start,
+                0,
+                &mut bytes,
+                &mut length,
+                &mut total_bytes,
+                &mut total_length,
+                &mut messages,
+            );
         }
 
-        match self.messages.get(1) {
+        match messages.get(1) {
             Some(_) => {
-                if self.total_bytes <= 140 {
+                if total_bytes <= 140 {
                     let mut parts = Vec::new();
                     let content: String = String::from("");
                     if self.options.summary {
-                        parts.push(SplitterPart::new(
-                            content,
-                            self.total_length,
-                            self.total_bytes,
-                        ));
+                        parts.push(SplitterPart::new(content, total_length, total_bytes));
                     } else {
                         parts.push(SplitterPart::new(
-                            self.message.clone(),
-                            self.total_length,
-                            self.total_bytes,
+                            original_message.clone(),
+                            total_length,
+                            total_bytes,
                         ));
                     }
                     return SplitterResult {
                         parts: parts.clone(),
-                        total_length: self.total_length,
-                        total_bytes: self.total_bytes,
+                        total_length,
+                        total_bytes,
                     };
                 }
             }
             None => {}
         }
         return SplitterResult {
-            parts: self.messages.clone(),
-            total_length: self.total_length,
-            total_bytes: self.total_bytes,
+            parts: messages.clone(),
+            total_length,
+            total_bytes,
         };
     }
 }
@@ -148,6 +163,7 @@ mod tests {
         let mut data = String::new();
         file.read_to_string(&mut data).unwrap();
         let test_data: serde_json::Value = serde_json::from_str(&data).unwrap();
+        let splitter = UnicodeSplitter::default();
         for test in test_data.as_array().unwrap() {
             println!(
                 "TEST: {:?}",
@@ -157,7 +173,7 @@ mod tests {
             let expected_parts = test["parts"].as_array().unwrap();
             let expected_total_length = test["totalLength"].as_u64().unwrap() as usize;
             let expected_total_bytes = test["totalBytes"].as_u64().unwrap() as usize;
-            let result = UnicodeSplitter::default().split(message);
+            let result = splitter.split(message);
             println!("RESULT: {:#?}", result);
             // println!("result.length: {} == {}", result.total_length, expected_total_length);
             assert_eq!(result.total_length, expected_total_length);

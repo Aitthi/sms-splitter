@@ -86,13 +86,11 @@ impl GsmValidator {
         false
     }
 
-    pub fn validate_character(self, character: char) -> bool {
-        let char_code = character as u16;
+    pub fn validate_character(self, char_code: u16) -> bool {
         self.exists_in_array(char_code, self.gsm_char_codes.clone())
     }
 
-    pub fn validate_character_with_shift_table(self, character: char) -> bool {
-        let char_code = character as u16;
+    pub fn validate_character_with_shift_table(self, char_code: u16) -> bool {
         // concat GSM_TR_charCodes, GSM_ES_charCodes, GSM_PT_charCodes
         let mut shift_table = self.gsm_tr_char_codes.clone();
         shift_table.append(&mut self.gsm_es_char_codes.clone());
@@ -132,13 +130,11 @@ impl GsmValidator {
         return false;
     }
 
-    pub fn validate_extended_character(self, character: char) -> bool {
-        let char_code = character as u16;
+    pub fn validate_extended_character(self, char_code: u16) -> bool {
         self.exists_in_array(char_code, self.gsme_char_codes.clone())
     }
     // validateExtendedCharacterWithShiftTable
-    pub fn validate_extended_character_with_shift_table(self, character: char) -> bool {
-        let char_code = character as u16;
+    pub fn validate_extended_character_with_shift_table(self, char_code: u16) -> bool {
         // var charCodes = GSMe_charCodes.concat(GSMe_TR_charCodes, GSMe_ES_charCodes, GSMe_PT_charCodes);
         let mut char_codes = self.gsme_char_codes.clone();
         char_codes.append(&mut self.gsme_tr_char_codes.clone());
@@ -243,7 +239,7 @@ mod tests {
     fn gsm_validator_all_characters() {
         let gsm_validator = GsmValidator::new();
         let message = "@Δ\x200¡P¿p£_!1AQaq$Φ\"2BRbr¥Γ#3CScsèΛ¤4DTdtéΩ%5EUeuùΠ&6FVfvìΨ\'7GWgwòΣ(8HXhxÇΘ)9IYiy\nΞ*:JZjzØ+;KÄkäøÆ,<LÖlö\ræ-=MÑmñÅß.>NÜnüåÉ/?O§oà|^€{}[~]\\f";
-        for c in message.chars() {
+        for c in message.encode_utf16().collect::<Vec<u16>>() {
             assert_eq!(gsm_validator.clone().validate_character(c), true);
         }
     }
@@ -253,7 +249,7 @@ mod tests {
     fn gsm_validator_all_characters_turkish() {
         let gsm_validator = GsmValidator::new();
         let message = "@£$¥€éùıòÇ\nĞğ\rÅåΔ_ΦΓΛΩΠΨΣΘΞŞşßÉ\x20!\"#¤%&\'()*+,-./0123456789:;<=>?İABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÑÜ§çabcdefghijklmnopqrstuvwxyzäöñüàf^{}[~]|";
-        for c in message.chars() {
+        for c in message.encode_utf16().collect::<Vec<u16>>() {
             assert_eq!(
                 gsm_validator.clone().validate_character_with_shift_table(c),
                 true
@@ -266,7 +262,7 @@ mod tests {
     fn gsm_validator_all_characters_portuguese() {
         let gsm_validator = GsmValidator::new();
         let message = "@£$¥êéúíóç\nÔô\rÁáΔ_ªÇÀ∞^\\€Ó|ÂâÊÉ\x20!\"#º%&\'()*+,-./0123456789:;<=>?ÍABCDEFGHIJKLMNOPQRSTUVWXYZÃÕÚÜ§~abcdefghijklmnopqrstuvwxyzãõ`üàfΦΓ^ΩΠΨΣΘ{}\\[~]|";
-        for c in message.chars() {
+        for c in message.encode_utf16().collect::<Vec<u16>>() {
             assert_eq!(
                 gsm_validator.clone().validate_character_with_shift_table(c),
                 true
@@ -278,7 +274,13 @@ mod tests {
     #[test]
     fn gsm_validator_non_gsm_character() {
         let gsm_validator = GsmValidator::new();
-        let message = '\u{1F433}';
+        let message = '\u{1F433}'
+            .to_string()
+            .encode_utf16()
+            .collect::<Vec<u16>>()
+            .get_mut(0)
+            .unwrap()
+            .clone();
         assert_eq!(gsm_validator.validate_character(message), false);
     }
 }
