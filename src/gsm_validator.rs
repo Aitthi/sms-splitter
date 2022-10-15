@@ -103,8 +103,8 @@ impl GsmValidator {
         message: String,
         char_codes: Vec<u16>,
     ) -> bool {
-        for c in message.chars() {
-            if !self.exists_in_array(c as u16, char_codes.clone()) {
+        for c in message.encode_utf16().collect::<Vec<u16>>(){
+            if !self.exists_in_array(c, char_codes.clone()) {
                 return false;
             }
         }
