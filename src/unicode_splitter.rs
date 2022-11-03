@@ -13,7 +13,7 @@ impl UnicodeSplitter {
     }
 
     fn is_high_surrogate(&self, code: u16) -> bool {
-        code >= 55296 && code <= 56319
+        (55296..=56319).contains(&code)
     }
 
     pub fn split(&self, message: String) -> SplitterResult {
@@ -59,13 +59,11 @@ impl UnicodeSplitter {
         let count = message.len();
         let mut i = 0;
         while i < count {
-            let space = '\u{0020}'
+            let space = *'\u{0020}'
                 .to_string()
                 .encode_utf16()
-                .collect::<Vec<u16>>()
-                .get(0)
-                .unwrap()
-                .clone();
+                .collect::<Vec<u16>>().first()
+                .unwrap();
             let code = message.get(i).unwrap_or(&space);
             let high_surrogate = self.is_high_surrogate(*code);
             // println!("bytes: {} {} {}", bytes, code, high_surrogate);
@@ -121,7 +119,7 @@ impl UnicodeSplitter {
                         parts.push(SplitterPart::new(content, total_length, total_bytes));
                     } else {
                         parts.push(SplitterPart::new(
-                            original_message.clone(),
+                            original_message,
                             total_length,
                             total_bytes,
                         ));
@@ -135,11 +133,11 @@ impl UnicodeSplitter {
             }
             None => {}
         }
-        return SplitterResult {
-            parts: messages.clone(),
+        SplitterResult {
+            parts: messages,
             total_length,
             total_bytes,
-        };
+        }
     }
 }
 
@@ -167,7 +165,7 @@ mod tests {
         for test in test_data.as_array().unwrap() {
             println!(
                 "TEST: {:?}",
-                test["description"].to_string().replace("\"", "")
+                test["description"].to_string().replace('\"', "")
             );
             let message = test["message"].as_str().unwrap().to_string();
             let expected_parts = test["parts"].as_array().unwrap();

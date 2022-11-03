@@ -108,7 +108,7 @@ impl GsmValidator {
                 return false;
             }
         }
-        return true;
+        true
     }
 
     pub fn validate_message(self, message: String) -> bool {
@@ -127,7 +127,7 @@ impl GsmValidator {
                 return true;
             }
         }
-        return false;
+        false
     }
 
     pub fn validate_extended_character(self, char_code: u16) -> bool {
@@ -274,13 +274,12 @@ mod tests {
     #[test]
     fn gsm_validator_non_gsm_character() {
         let gsm_validator = GsmValidator::new();
-        let message = '\u{1F433}'
+        let message = *'\u{1F433}'
             .to_string()
             .encode_utf16()
             .collect::<Vec<u16>>()
             .get_mut(0)
-            .unwrap()
-            .clone();
+            .unwrap();
         assert_eq!(gsm_validator.validate_character(message), false);
     }
 }

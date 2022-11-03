@@ -16,7 +16,7 @@ impl GsmSplitter {
     }
 
     fn is_high_surrogate(&self, code: u16) -> bool {
-        code >= 55296 && code <= 56319
+        (55296..=56319).contains(&code)
     }
 
     // SplitterResult
@@ -52,13 +52,11 @@ impl GsmSplitter {
         // println!("count: {}", count);
         let mut i = 0;
         while i < count {
-            let space = '\u{0020}'
+            let space = *'\u{0020}'
                 .to_string()
                 .encode_utf16()
-                .collect::<Vec<u16>>()
-                .get(0)
-                .unwrap()
-                .clone();
+                .collect::<Vec<u16>>().first()
+                .unwrap();
             let mut code = message.get(i).unwrap_or(&space);
             // println!("bytes: {} {}", bytes, code);
             if !self.validate_character(*code) {
@@ -132,18 +130,18 @@ impl GsmSplitter {
             }
             None => {}
         }
-        return SplitterResult {
-            parts: messages.clone(),
+        SplitterResult {
+            parts: messages,
             total_length,
             total_bytes,
-        };
+        }
     }
 
     fn validate_character(&self, character_code: u16) -> bool {
         if self.options.support_shift_tables {
             return GsmValidator::new().validate_character_with_shift_table(character_code);
         }
-        return GsmValidator::new().validate_character(character_code);
+        GsmValidator::new().validate_character(character_code)
     }
 
     fn validate_extended_character(&self, character_code: u16) -> bool {
@@ -151,7 +149,7 @@ impl GsmSplitter {
             return GsmValidator::new()
                 .validate_extended_character_with_shift_table(character_code);
         }
-        return GsmValidator::new().validate_extended_character(character_code);
+        GsmValidator::new().validate_extended_character(character_code)
     }
 }
 
@@ -182,7 +180,7 @@ mod tests {
         for test in test_data.as_array().unwrap() {
             println!(
                 "TEST: {:?}",
-                test["description"].to_string().replace("\"", "")
+                test["description"].to_string().replace('\"', "")
             );
             let message = test["message"].as_str().unwrap().to_string();
             let expected_parts = test["parts"].as_array().unwrap();

@@ -80,14 +80,14 @@ impl SplitSms {
         if parts.len() == 1 {
             max = single_bytes;
         }
-        return (max - parts[parts.len() - 1].bytes) / char_bytes;
+        (max - parts[parts.len() - 1].bytes) / char_bytes
     }
 
     fn validate_message(&self, message: String) -> bool {
         if self.options.support_shift_tables {
             return gsm_validator::GsmValidator::new().validate_message_with_shift_table(message);
         }
-        return gsm_validator::GsmValidator::new().validate_message(message);
+        gsm_validator::GsmValidator::new().validate_message(message)
     }
 
     pub fn split(&self, message: String) -> SplitSmsResult {
@@ -102,7 +102,7 @@ impl SplitSms {
                 self.options.support_shift_tables,
                 self.options.summary,
             ))
-            .split(message.clone());
+            .split(message);
             single_bytes = 160;
             multi_bytes = 153;
             char_bytes = 1;
@@ -112,7 +112,7 @@ impl SplitSms {
                 self.options.support_shift_tables,
                 self.options.summary,
             ))
-            .split(message.clone());
+            .split(message);
             single_bytes = 140;
             multi_bytes = 134;
             char_bytes = 2;
