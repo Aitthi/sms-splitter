@@ -5,7 +5,7 @@ use crate::{
 };
 
 // Debug
-#[derive(Debug)]
+#[derive(Debug,Default)]
 pub struct GsmSplitter {
     options: SplitterOptions,
 }
@@ -106,29 +106,24 @@ impl GsmSplitter {
                 &mut messages,
             );
         }
-        match messages.get(1) {
-            Some(_) => {
-                if total_bytes <= 160 {
-                    let mut parts = Vec::new();
-                    let content: String = String::from("");
-                    // options.summary ? undefined : messages[0].content + messages[1].content
-                    if self.options.summary {
-                        parts.push(SplitterPart::new(content, total_length, total_bytes));
-                    } else {
-                        parts.push(SplitterPart::new(
-                            messages[0].content.clone() + &messages[1].content,
-                            total_length,
-                            total_bytes,
-                        ));
-                    }
-                    return SplitterResult {
-                        parts: parts.clone(),
-                        total_length,
-                        total_bytes,
-                    };
-                }
+        if messages.get(1).is_some() && total_bytes <= 160 {
+            let mut parts = Vec::new();
+            let content: String = String::from("");
+            // options.summary ? undefined : messages[0].content + messages[1].content
+            if self.options.summary {
+                parts.push(SplitterPart::new(content, total_length, total_bytes));
+            } else {
+                parts.push(SplitterPart::new(
+                    messages[0].content.clone() + &messages[1].content,
+                    total_length,
+                    total_bytes,
+                ));
             }
-            None => {}
+            return SplitterResult {
+                parts: parts.clone(),
+                total_length,
+                total_bytes,
+            };
         }
         SplitterResult {
             parts: messages,
@@ -150,15 +145,6 @@ impl GsmSplitter {
                 .validate_extended_character_with_shift_table(character_code);
         }
         GsmValidator::new().validate_extended_character(character_code)
-    }
-}
-
-// GsmSplitter default options
-impl Default for GsmSplitter {
-    fn default() -> Self {
-        GsmSplitter {
-            options: SplitterOptions::default(),
-        }
     }
 }
 

@@ -38,12 +38,12 @@ impl UnicodeSplitter {
             let mut content: Vec<u16> = Vec::new();
             if !self.options.summary {
                 if part_end > 0 {
-                    for i in *part_start..part_end + 1 {
-                        content.push(message[i]);
+                    for msg in message.iter().take(part_end + 1).skip(*part_start) {
+                        content.push(*msg);
                     }
                 } else {
-                    for i in *part_start..message.len() {
-                        content.push(message[i]);
+                    for msg in message.iter().skip(*part_start) {
+                        content.push(*msg);
                     }
                 }
             }
@@ -110,28 +110,23 @@ impl UnicodeSplitter {
             );
         }
 
-        match messages.get(1) {
-            Some(_) => {
-                if total_bytes <= 140 {
-                    let mut parts = Vec::new();
-                    let content: String = String::from("");
-                    if self.options.summary {
-                        parts.push(SplitterPart::new(content, total_length, total_bytes));
-                    } else {
-                        parts.push(SplitterPart::new(
-                            original_message,
-                            total_length,
-                            total_bytes,
-                        ));
-                    }
-                    return SplitterResult {
-                        parts: parts.clone(),
-                        total_length,
-                        total_bytes,
-                    };
-                }
+        if messages.get(1).is_some() && total_bytes <= 140 {
+            let mut parts = Vec::new();
+            let content: String = String::from("");
+            if self.options.summary {
+                parts.push(SplitterPart::new(content, total_length, total_bytes));
+            } else {
+                parts.push(SplitterPart::new(
+                    original_message,
+                    total_length,
+                    total_bytes,
+                ));
             }
-            None => {}
+            return SplitterResult {
+                parts: parts.clone(),
+                total_length,
+                total_bytes,
+            };
         }
         SplitterResult {
             parts: messages,

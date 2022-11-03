@@ -7,11 +7,9 @@ pub struct SplitterResult {
 
 impl SplitterResult {
     pub fn empty() -> Self {
-        let mut parts = Vec::new();
-        // new SplitterPart
-        parts.push(SplitterPart::new(String::new(), 0, 0));
+        let parts = vec![SplitterPart::new(String::new(), 0, 0)];
         SplitterResult {
-            parts: parts.clone(),
+            parts,
             total_length: 0,
             total_bytes: 0,
         }

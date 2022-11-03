@@ -9,6 +9,12 @@ pub struct GsmValidator {
     gsme_pt_char_codes: Vec<u16>,
 }
 
+impl Default for GsmValidator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl GsmValidator {
     pub fn new() -> GsmValidator {
         GsmValidator {

@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug,Default)]
 pub struct SplitterOptions {
     pub support_shift_tables: bool,
     pub summary: bool,
@@ -9,16 +9,6 @@ impl SplitterOptions {
         SplitterOptions {
             support_shift_tables,
             summary,
-        }
-    }
-}
-
-// default options
-impl Default for SplitterOptions {
-    fn default() -> Self {
-        SplitterOptions {
-            support_shift_tables: false,
-            summary: false,
         }
     }
 }
