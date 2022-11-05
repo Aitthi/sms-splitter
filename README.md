@@ -58,11 +58,11 @@ console.log(splitter.split(message));
 ```
 ```json
 {
-  character_set: 'GSM',
-  parts: [ { content: 'Hello World!', length: 12, bytes: 12 } ],
-  bytes: 12,
-  length: 12,
-  remaining_in_part: 148
+  "character_set": "GSM",
+  "parts": [ { "content": "Hello World!", "length": 12, "bytes": 12 } ],
+  "bytes": 12,
+  "length": 12,
+  "remaining_in_part": 148
 }
 ```
 
