@@ -1,0 +1,26 @@
+[package]
+name = "sms_splitter"
+version = "0.1.9"
+edition = "2021"
+license = "MIT"
+authors = ["Aitthi <meanstack20@gmail.com>"]
+description = "An SMS message splitter and part calculator with support for GSM and Unicode"
+categories = ["sms", "gsm", "unicode"]
+keywords = ["SMS", "GSM", "Unicode", "splitter", "split-sms"]
+repository = "https://github.com/Aitthi/sms-splitter"
+readme = "README.md"
+include = [
+    "src/*.rs",
+    "examples/*.rs",
+    "Cargo.toml",
+    "Cargo.lock",
+    "test/*.json",
+]
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde = { version = "1.0.147", features = ["derive"] }
+serde_json = "1.0.87"
+
+# dev dependencies
+[dev-dependencies]

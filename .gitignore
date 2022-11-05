@@ -1,2 +1,3 @@
-/target
-._target
+target
+/sms-splitter/target
+/sms-splitter-wasmsms-splitter-wasm/target

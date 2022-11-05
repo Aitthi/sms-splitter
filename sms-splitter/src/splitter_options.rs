@@ -1,4 +1,6 @@
-#[derive(Debug,Default)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug,Default,Serialize, Deserialize)]
 pub struct SplitterOptions {
     pub support_shift_tables: bool,
     pub summary: bool,

@@ -52,6 +52,7 @@ pub mod unicode_splitter;
 // use
 use splitter_options::SplitterOptions;
 use splitter_result::{SplitterPart, SplitterResult};
+use serde::ser::SerializeStruct;
 
 #[derive(Debug)]
 pub struct SplitSms {
@@ -154,6 +155,42 @@ impl SplitSmsResult {
             length,
             remaining_in_part,
         }
+    }
+
+    // to string
+    pub fn to_string(&self) -> String {
+        serde_json::to_string(&self).unwrap()
+    }
+    
+}
+
+// Serialize
+impl serde::Serialize for SplitSmsResult {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut state = serializer.serialize_struct("SplitSmsResult", 5)?;
+        state.serialize_field("character_set", &self.character_set)?;
+        state.serialize_field("parts", &self.parts)?;
+        state.serialize_field("bytes", &self.bytes)?;
+        state.serialize_field("length", &self.length)?;
+        state.serialize_field("remaining_in_part", &self.remaining_in_part)?;
+        state.end()
+    }
+}
+
+// SplitterPart Serialize
+impl serde::Serialize for SplitterPart {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut state = serializer.serialize_struct("SplitterPart", 3)?;
+        state.serialize_field("content", &self.content)?;
+        state.serialize_field("length", &self.length)?;
+        state.serialize_field("bytes", &self.bytes)?;
+        state.end()
     }
 }
 
