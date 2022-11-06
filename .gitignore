@@ -1,3 +1,5 @@
 target
 /sms-splitter/target
 /sms-splitter-wasmsms-splitter-wasm/target
+.DS_Store
+*/.DS_Store
